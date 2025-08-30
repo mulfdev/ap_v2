@@ -41,7 +41,20 @@ contract AP1155 is ERC1155 {
         _mint(_creator, 1, 1, "");
     }
 
-    function _mintChecks(uint256 id, address referrer) internal {
+    function configureToken(uint256 id, string memory tokenURI, uint256 expiration) external {
+        require(msg.sender == creator, NotCreator());
+        _mintCloseDate[id] = expiration;
+        _tokenURIs[id] = tokenURI;
+        _mint(creator, id, 1, "");
+    }
+
+    function uri(
+        uint256 id
+    ) public view override returns (string memory) {
+        return _tokenURIs[id];
+    }
+
+    function mint(uint256 id, uint16 amount, address to, address referrer) public payable {
         require(bytes(_tokenURIs[id]).length != 0, TokenNotConfigured());
 
         uint256 expiration = _mintCloseDate[id];
@@ -60,23 +73,7 @@ contract AP1155 is ERC1155 {
 
         require(mintFeeOk, MintFeeFailed());
         require(creatorFeeOk, CreatorFeeFailed());
-    }
 
-    function configureToken(uint256 id, string memory tokenURI, uint256 expiration) external {
-        require(msg.sender == creator, NotCreator());
-        _mintCloseDate[id] = expiration;
-        _tokenURIs[id] = tokenURI;
-        _mint(creator, id, 1, "");
-    }
-
-    function uri(
-        uint256 id
-    ) public view override returns (string memory) {
-        return _tokenURIs[id];
-    }
-
-    function mint(uint256 id, uint16 amount, address to, address referrer) public payable {
-        _mintChecks(id, referrer);
         _mint(to, id, amount, "");
 
         emit TokenMinted({ id: id, minter: msg.sender });
