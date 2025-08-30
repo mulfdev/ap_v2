@@ -24,12 +24,14 @@ contract AP1155 is ERC1155 {
     error ReferralFeeFailed();
     error TokenNotConfigured();
     error MintClosed();
+    error BatchLengthWrong();
 
     constructor(
         string memory _metadata,
         address _feeRecipient,
         address _creator,
-        uint256 _creatorFee
+        uint256 _creatorFee,
+        uint256 _referralFee
     ) {
         _tokenURIs[1] = string(
             abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(_metadata)))
@@ -38,6 +40,7 @@ contract AP1155 is ERC1155 {
         feeRecipient = _feeRecipient;
         creator = _creator;
         creatorFee = _creatorFee;
+        referralFee = _referralFee;
         _mint(_creator, 1, 1, "");
     }
 
@@ -48,6 +51,29 @@ contract AP1155 is ERC1155 {
 
         if (expiration != 0 && expiration > block.timestamp) {
             revert MintClosed();
+        }
+
+        (bool mintFeeOk,) = feeRecipient.call{ value: PLATFORM_FEE }("");
+        (bool creatorFeeOk,) = creator.call{ value: creatorFee }("");
+
+        if (referrer != address(0)) {
+            (bool referralFeeOk,) = referrer.call{ value: referralFee }("");
+            require(referralFeeOk, ReferralFeeFailed());
+        }
+
+        require(mintFeeOk, MintFeeFailed());
+        require(creatorFeeOk, CreatorFeeFailed());
+    }
+
+    function _mintChecks(uint256[] calldata ids, address referrer) internal {
+        for (uint256 i = 0; i < ids.length; i++) {
+            require(bytes(_tokenURIs[ids[i]]).length != 0, TokenNotConfigured());
+
+            uint256 expiration = _mintCloseDate[ids[i]];
+
+            if (expiration != 0 && expiration > block.timestamp) {
+                revert MintClosed();
+            }
         }
 
         (bool mintFeeOk,) = feeRecipient.call{ value: PLATFORM_FEE }("");
@@ -88,9 +114,8 @@ contract AP1155 is ERC1155 {
         address to,
         address referrer
     ) external payable {
-        for (uint256 i = 0; i < ids.length; i++) {
-            _mintChecks(ids[i], referrer);
-        }
+        require(ids.length == amounts.length, BatchLengthWrong());
+        _mintChecks(ids, referrer);
 
         _batchMint(to, ids, amounts, "");
     }
