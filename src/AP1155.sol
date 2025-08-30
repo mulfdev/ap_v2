@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.30;
 
 import { ERC1155 } from "solady/tokens/ERC1155.sol";
