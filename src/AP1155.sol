@@ -16,7 +16,7 @@ contract AP1155 is ERC1155 {
     mapping(uint256 id => string uri) private _tokenURIs;
     mapping(uint256 id => uint256 deadline) private _mintCloseDate;
 
-    event TokenMinted(uint256 id, address minter);
+    event TokenAdded(uint256 id);
 
     error MintFeeFailed();
     error NotCreator();
@@ -93,6 +93,8 @@ contract AP1155 is ERC1155 {
         _mintCloseDate[id] = expiration;
         _tokenURIs[id] = tokenURI;
         _mint(creator, id, 1, "");
+
+        emit TokenAdded({ id: id });
     }
 
     function uri(
@@ -104,8 +106,6 @@ contract AP1155 is ERC1155 {
     function mint(uint256 id, uint16 amount, address to, address referrer) external payable {
         _mintChecks(id, referrer);
         _mint(to, id, amount, "");
-
-        emit TokenMinted({ id: id, minter: msg.sender });
     }
 
     function batchMint(
@@ -116,7 +116,6 @@ contract AP1155 is ERC1155 {
     ) external payable {
         require(ids.length == amounts.length, BatchLengthWrong());
         _mintChecks(ids, referrer);
-
         _batchMint(to, ids, amounts, "");
     }
 

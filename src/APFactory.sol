@@ -19,8 +19,8 @@ contract APFactory is Ownable {
         feeRecipient = newFeeRecipient;
     }
 
-    function deployNew(string memory metadata, uint256 creatorFee) external {
-        new AP1155(metadata, feeRecipient, msg.sender, creatorFee);
+    function deployNew(string memory metadata, uint256 creatorFee, uint256 referralFee) external {
+        new AP1155(metadata, feeRecipient, msg.sender, creatorFee, referralFee);
     }
 
 }
