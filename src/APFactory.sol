@@ -21,9 +21,12 @@ contract APFactory is Ownable {
 
     /// @notice Constructor to initialize the factory.
     /// @dev Sets the initial fee recipient to the deployer and initializes ownership.
-    constructor() {
-        feeRecipient = 0xcDad9f233dAFC49E81b3aC1Abef7C8ef8334986A;
-        _initializeOwner(0xcDad9f233dAFC49E81b3aC1Abef7C8ef8334986A);
+    /// @param multisig The address of the deployed multisig
+    constructor(
+        address multisig
+    ) {
+        feeRecipient = multisig;
+        _initializeOwner(multisig);
     }
 
     /// @notice Updates the fee recipient address.
