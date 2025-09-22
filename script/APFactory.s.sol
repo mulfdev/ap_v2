@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.30;
 
+import { AP1155 } from "../src/AP1155.sol";
 import { APFactory } from "../src/APFactory.sol";
 import { Script, console } from "forge-std/Script.sol";
 
@@ -12,6 +13,7 @@ contract APFactoryScript is Script {
 
     function run() public {
         vm.startBroadcast();
+        vm.deal(msg.sender, 1 ether);
 
         apFactory = new APFactory();
         string memory metadata =
@@ -19,8 +21,8 @@ contract APFactoryScript is Script {
 
         address deployedAP1155 = apFactory.deployNew(
             metadata,
-            1000,
-            500,
+            8e13,
+            8e13,
             "Test Collection",
             "TEST",
             "A test collection for the AP1155 contract deployment",
@@ -28,24 +30,16 @@ contract APFactoryScript is Script {
             "https://mulf.wtf"
         );
 
+        AP1155 new1155 = AP1155(deployedAP1155);
+
         console.log("Deployed AP1155 address:", deployedAP1155);
 
-        // ABI encode constructor args for the deployed AP1155 contract
-        bytes memory constructorArgs = abi.encode(
-            metadata,
-            apFactory.feeRecipient(), // actual feeRecipient from factory
-            msg.sender, // actual creator (script deployer)
-            1000, // creatorFee
-            500, // referralFee
-            "Test Collection",
-            "TEST", 
-            "A test collection for the AP1155 contract deployment",
-            "https://media.mulf.wtf/collection-img.png",
-            "https://mulf.wtf"
-        );
-        
-        console.log("AP1155 Constructor args (hex):");
-        console.logBytes(constructorArgs);
+        uint256[] memory ids = new uint256[](1);
+        ids[0] = 1;
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+
+        new1155.mint{ value: 8e13 * 3 }(1, 100, msg.sender, address(0));
 
         vm.stopBroadcast();
     }

@@ -9,6 +9,7 @@ import { ReentrancyGuardTransient } from "solady/utils/ReentrancyGuardTransient.
 /**
  * @title AP1155 - Artist Program ERC1155 Token Contract
  * @notice Multi-token NFT contract with creator monetization features
+ * @author mulf
  * @dev Implements ERC1155 with custom fee distribution, referral system, and token deadlines
  *
  * Features:
