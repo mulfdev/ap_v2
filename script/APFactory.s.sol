@@ -12,15 +12,11 @@ contract APFactoryScript is Script {
     function setUp() public { }
 
     function run() public {
-        vm.startBroadcast();
-        vm.deal(msg.sender, 1 ether);
-
-        apFactory = new APFactory();
+        apFactory = new APFactory(0xcDad9f233dAFC49E81b3aC1Abef7C8ef8334986A);
         string memory metadata =
             '{"name":"Test NFT #1","description":"A test NFT for the AP1155 contract deployment","image":"https://media.mulf.wtf/testnft-img.png","attributes":[{"trait_type":"Collection","value":"Test Collection"},{"trait_type":"Rarity","value":"Common"}],"external_url":"https://your-website.com","background_color":"000000"}';
 
         address deployedAP1155 = apFactory.deployNew(
-            metadata,
             8e13,
             8e13,
             "Test Collection",

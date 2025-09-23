@@ -36,7 +36,7 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
     FeeInfo public feeInfo;
 
     /// @notice Struct containing collection metadata
-    struct TokenMetadata {
+    struct CollectionMetadata {
         string name;
         string symbol;
         string description;
@@ -45,7 +45,7 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
     }
 
     /// @notice Public variable holding collection metadata
-    TokenMetadata public tokenMetadata;
+    CollectionMetadata public collectionMetadata;
 
     /// @notice Mapping of token ID to its metadata URI
     mapping(uint256 id => string uri) public _tokenURIs;
@@ -128,7 +128,6 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
 
     /**
      * @notice Initializes the AP1155 contract with collection metadata and fee configuration
-     * @param _metadata Base64-encoded JSON metadata for token ID 1
      * @param _feeRecipient Address that receives platform fees
      * @param _creator Address of the collection creator
      * @param _creatorFee Fee amount sent to creator per mint (in wei)
@@ -140,7 +139,6 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
      * @param _external_link Collection external link for contract metadata
      */
     constructor(
-        string memory _metadata,
         address _feeRecipient,
         address _creator,
         uint256 _creatorFee,
@@ -151,10 +149,6 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
         string memory _image,
         string memory _external_link
     ) {
-        _tokenURIs[1] = string(
-            abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(_metadata)))
-        );
-
         feeInfo = FeeInfo({
             feeRecipient: _feeRecipient,
             creator: _creator,
@@ -162,7 +156,7 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
             referralFee: _referralFee
         });
 
-        tokenMetadata = TokenMetadata({
+        collectionMetadata = CollectionMetadata({
             name: _name,
             symbol: _symbol,
             description: _description,
@@ -266,7 +260,6 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
         require(bytes(_tokenURIs[id]).length == 0, TokenAlreadyConfigured());
         _mintCloseDate[id] = expiration;
         _tokenURIs[id] = tokenURI;
-        _mint(feeInfo.creator, id, 1, "");
 
         emit TokenAdded({ id: id, tokenURI: tokenURI, deadline: expiration, creator: msg.sender });
         emit PermanentURI({ tokenURI: tokenURI, id: id });
@@ -278,20 +271,30 @@ contract AP1155 is ERC1155, ReentrancyGuardTransient {
      * @return JSON string containing collection name, description, image, and external link
      */
     function contractURI() public view returns (string memory) {
-        return string.concat(
+        string memory json = string.concat(
             '{"name":"',
-            LibString.escapeJSON(tokenMetadata.name),
+            LibString.escapeJSON(collectionMetadata.name),
             '",',
             '"description":"',
-            LibString.escapeJSON(tokenMetadata.description),
+            LibString.escapeJSON(collectionMetadata.description),
             '",',
             '"image":"',
-            LibString.escapeJSON(tokenMetadata.image),
+            LibString.escapeJSON(collectionMetadata.image),
             '",',
             '"external_link":"',
-            LibString.escapeJSON(tokenMetadata.external_link),
+            LibString.escapeJSON(collectionMetadata.external_link),
             '"}'
         );
+
+        return string.concat("data:application/json;utf8,", json);
+    }
+
+    function name() public view returns (string memory) {
+        return collectionMetadata.name;
+    }
+
+    function symbol() public view returns (string memory) {
+        return collectionMetadata.symbol;
     }
 
     /**

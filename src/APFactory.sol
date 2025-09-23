@@ -7,7 +7,6 @@ import { Ownable } from "solady/auth/Ownable.sol";
 /// @title APFactory
 /// @author mulf
 /// @notice Factory contract for deploying new AP1155 collection contracts.
-/// @dev This contract allows users to create new AP1155 collections with specified parameters.
 /// It inherits from Ownable for access control on fee recipient updates.
 contract APFactory is Ownable {
 
@@ -41,7 +40,6 @@ contract APFactory is Ownable {
     /// @notice Deploys a new AP1155 collection contract.
     /// @dev Creates a new AP1155 instance with the provided parameters and emits a
     /// CollectionCreated event.
-    /// @param metadata Base64-encoded JSON metadata for the collection.
     /// @param creatorFee Fee percentage for the creator (in basis points).
     /// @param referralFee Fee percentage for referrals (in basis points).
     /// @param name Name of the collection.
@@ -51,7 +49,6 @@ contract APFactory is Ownable {
     /// @param external_link External link for the collection.
     /// @return The address of the newly deployed AP1155 contract.
     function deployNew(
-        string memory metadata,
         uint256 creatorFee,
         uint256 referralFee,
         string memory name,
@@ -62,7 +59,6 @@ contract APFactory is Ownable {
     ) external returns (address) {
         address newCollection = address(
             new AP1155(
-                metadata,
                 feeRecipient,
                 msg.sender,
                 creatorFee,
