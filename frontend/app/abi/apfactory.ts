@@ -1,7 +1,13 @@
-export const apFactory = [
+export const apfactoryAbi = [
   {
     type: "constructor",
-    inputs: [],
+    inputs: [
+      {
+        name: "multisig",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     stateMutability: "nonpayable",
   },
   {
@@ -28,11 +34,6 @@ export const apFactory = [
     type: "function",
     name: "deployNew",
     inputs: [
-      {
-        name: "metadata",
-        type: "string",
-        internalType: "string",
-      },
       {
         name: "creatorFee",
         type: "uint256",
@@ -162,6 +163,19 @@ export const apFactory = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    name: "CollectionCreated",
+    inputs: [
+      {
+        name: "newCollection",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
   },
   {
     type: "event",

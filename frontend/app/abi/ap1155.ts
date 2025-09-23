@@ -3,11 +3,6 @@ export const ap1155Abi = [
     type: "constructor",
     inputs: [
       {
-        name: "_metadata",
-        type: "string",
-        internalType: "string",
-      },
-      {
         name: "_feeRecipient",
         type: "address",
         internalType: "address",
@@ -168,6 +163,39 @@ export const ap1155Abi = [
     ],
     outputs: [],
     stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "collectionMetadata",
+    inputs: [],
+    outputs: [
+      {
+        name: "name",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "symbol",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "description",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "image",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "external_link",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -384,39 +412,6 @@ export const ap1155Abi = [
         name: "result",
         type: "bool",
         internalType: "bool",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "tokenMetadata",
-    inputs: [],
-    outputs: [
-      {
-        name: "name",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "symbol",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "description",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "image",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "external_link",
-        type: "string",
-        internalType: "string",
       },
     ],
     stateMutability: "view",

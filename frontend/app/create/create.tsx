@@ -8,11 +8,11 @@ import {
 } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { ap1155Abi } from "../abi/ap1155";
-import { apFactory } from "../abi/apfactory";
+import { apfactoryAbi } from "../abi/apfactory";
 import Toast from "../Toast";
 
 // TODO: Replace with actual deployed factory address
-const FACTORY_ADDRESS = "0x0000000000000000000000000000000000000000";
+const FACTORY_ADDRESS = "0x8f8e3C1d272381495E7e63a8c7A886ec2561E800";
 
 export default function Create() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -33,19 +33,25 @@ export default function Create() {
   const [expiration, setExpiration] = useState("");
 
   const { address, isConnected } = useAccount();
-  const { writeContract: writeFactory, data: factoryHash, isPending: factoryPending, error: factoryError } = useWriteContract();
+  const {
+    writeContract: writeFactory,
+    data: factoryHash,
+    isPending: factoryPending,
+    error: factoryError,
+  } = useWriteContract();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: factoryConfirming, isSuccess: factorySuccess } = useWaitForTransactionReceipt({
-    hash: factoryHash,
-  });
+  const { isLoading: factoryConfirming, isSuccess: factorySuccess } =
+    useWaitForTransactionReceipt({
+      hash: factoryHash,
+    });
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
   useWatchContractEvent({
     address: FACTORY_ADDRESS,
-    abi: apFactory,
-    eventName: 'CollectionCreated',
+    abi: apfactoryAbi,
+    eventName: "CollectionCreated",
     onLogs: (logs) => {
       const newCollection = logs[0].args.newCollection as string;
       setDeployedContract(newCollection);
@@ -81,24 +87,11 @@ export default function Create() {
         return;
       }
 
-      // Create collection metadata JSON
-      const collectionMetadata = {
-        name: collectionName,
-        symbol: collectionSymbol,
-        description: collectionDescription,
-        image: collectionImage,
-        external_link: collectionExternalLink,
-      };
-
-      // Base64 encode the JSON
-      const collectionURI = `data:application/json;base64,${btoa(JSON.stringify(collectionMetadata))}`;
-
       writeFactory({
         address: FACTORY_ADDRESS,
-        abi: apFactory,
+        abi: apfactoryAbi,
         functionName: "deployNew",
         args: [
-          collectionURI,
           0n, // creatorFee
           0n, // referralFee
           collectionName,
@@ -542,20 +535,21 @@ export default function Create() {
             <div className="font-medium mb-2">
               🎨 Your artwork has been created!
             </div>
-             <div className="text-sm space-y-1">
-               <div>
-                 Collection:{" "}
-                 <span className="font-mono">"{collectionName}"</span>
-               </div>
-               <div>
-                 Collection Address: <span className="font-mono">{deployedContract}</span>
-               </div>
-               <div>
-                 Artwork ID: <span className="font-mono">{tokenId}</span>
-               </div>
-               <div>
-                 Title: <span className="font-mono">"{tokenName}"</span>
-               </div>
+            <div className="text-sm space-y-1">
+              <div>
+                Collection:{" "}
+                <span className="font-mono">"{collectionName}"</span>
+              </div>
+              <div>
+                Collection Address:{" "}
+                <span className="font-mono">{deployedContract}</span>
+              </div>
+              <div>
+                Artwork ID: <span className="font-mono">{tokenId}</span>
+              </div>
+              <div>
+                Title: <span className="font-mono">"{tokenName}"</span>
+              </div>
               <div className="mt-3">
                 <a
                   href={`https://basescan.org/tx/${hash}`}
